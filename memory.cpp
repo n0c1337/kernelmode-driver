@@ -113,7 +113,7 @@ bool KeWriteVirtualMemory(HANDLE pid, unsigned __int64 address, void* buffer, un
 	return true;
 }
 
-unsigned long long KeGetModuleBase(PEPROCESS process, UNICODE_STRING module_name)
+unsigned __int64 KeGetModuleBase(PEPROCESS process, UNICODE_STRING module_name)
 {
 	PPEB pPeb = PsGetProcessPeb(process);
 
