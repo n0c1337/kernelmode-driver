@@ -44,7 +44,7 @@ bool KeWritePhysicalMemory(HANDLE pid, void* address, void* buffer, unsigned __i
 	PHYSICAL_ADDRESS physical_address = MmGetPhysicalAddress(address);
 	
 	KeUnstackDetachProcess(&state);
-	PVOID mappedMemory = MmMapIoSpaceEx(physical_address, size, PAGE_READWRITE);
+	void* mappedMemory = MmMapIoSpaceEx(physical_address, size, PAGE_READWRITE);
 	if (!mappedMemory) return false;
 
 	memcpy(mappedMemory, buffer, size);
@@ -85,7 +85,7 @@ bool KeWriteVirtualMemory(HANDLE pid, unsigned __int64 address, void* buffer, un
 
 	MEMORY_BASIC_INFORMATION info;
 
-	status = ZwQueryVirtualMemory(ZwCurrentProcess(), (PVOID)address, MemoryBasicInformation, &info, sizeof(info), NULL);
+	status = ZwQueryVirtualMemory(ZwCurrentProcess(), (void*)address, MemoryBasicInformation, &info, sizeof(info), NULL);
 	if (!NT_SUCCESS(status))
 	{
 		KeUnstackDetachProcess(&state);
