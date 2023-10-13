@@ -8,4 +8,4 @@ Kernel Mode functions [KE](https://learn.microsoft.com/de-de/windows-hardware/dr
 - Why am I releasing this? I'm currently rewritting the whole Driver in Rust
 
 ## IDA:
-![IDA View]()
+![IDA View](https://raw.githubusercontent.com/n0c1337/kernelmode-driver/master/images/Screenshot%202023-10-13%20174102.png)
