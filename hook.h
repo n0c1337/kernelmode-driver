@@ -23,7 +23,7 @@ __int64 __fastcall hkFunction(void* a1)
 	case write_vm: {
 		if (cmd->address < 0x7FFFFFFFFFFF && cmd->address > 0)
 		{
-			PVOID kernelBuff = ExAllocatePool(NonPagedPool, cmd->size);
+			void* kernelBuff = ExAllocatePool(NonPagedPool, cmd->size);
 			if (!kernelBuff)
 			{
 				return STATUS_UNSUCCESSFUL;
