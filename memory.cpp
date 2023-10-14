@@ -55,7 +55,7 @@ bool KeWritePhysicalMemory(HANDLE pid, void* address, void* buffer, unsigned __i
 
 bool KeReadVirtualMemory(HANDLE pid, unsigned __int64 address, void* buffer, unsigned __int64 size)
 {
-	if (!address || !buffer || !size)
+	if (!pid || !address || !buffer || !size)
 		return false;
 
 	SIZE_T Result = 0;
@@ -73,44 +73,21 @@ bool KeReadVirtualMemory(HANDLE pid, unsigned __int64 address, void* buffer, uns
 
 bool KeWriteVirtualMemory(HANDLE pid, unsigned __int64 address, void* buffer, unsigned __int64 size)
 {
-	if (!address || !buffer || !size)
+	if (!pid || !address || !buffer || !size)
 		return false;
 
+	SIZE_T Result = 0;
 	NTSTATUS status = STATUS_SUCCESS;
 	PEPROCESS process;
 	PsLookupProcessByProcessId((HANDLE)pid, &process);
 
-	KAPC_STATE state;
-	KeStackAttachProcess((PEPROCESS)process, &state);
+	status = MmCopyVirtualMemory(PsGetCurrentProcess(), (void*)address, process, (void*)buffer, size, KernelMode, &Result);
 
-	MEMORY_BASIC_INFORMATION info;
-
-	status = ZwQueryVirtualMemory(ZwCurrentProcess(), (void*)address, MemoryBasicInformation, &info, sizeof(info), NULL);
 	if (!NT_SUCCESS(status))
-	{
-		KeUnstackDetachProcess(&state);
 		return false;
-	}
+	else
+		return true;
 
-	if (((unsigned __int64)info.BaseAddress + info.RegionSize) < (address + size))
-	{
-		KeUnstackDetachProcess(&state);
-		return false;
-	}
-
-	if (!(info.State & MEM_COMMIT) || (info.Protect & (PAGE_GUARD | PAGE_NOACCESS)))
-	{
-		KeUnstackDetachProcess(&state);
-		return false;
-	}
-
-	if ((info.Protect & PAGE_EXECUTE_READWRITE) || (info.Protect & PAGE_EXECUTE_WRITECOPY)
-		|| (info.Protect & PAGE_READWRITE) || (info.Protect & PAGE_WRITECOPY))
-	{
-		memcpy((void*)address, buffer, size);
-	}
-	KeUnstackDetachProcess(&state);
-	return true;
 }
 
 unsigned __int64 KeGetModuleBase(PEPROCESS process, UNICODE_STRING module_name)
